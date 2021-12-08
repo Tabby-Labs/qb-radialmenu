@@ -20,7 +20,7 @@ CreateThread(function()
             heading=Garages[k].heading,
             minZ=Garages[k].minZ,
             maxZ=Garages[k].maxZ,
-            debugPoly=debugPz
+            debugPoly=Garages[k].debugPz
         })
     end
     for k, v in pairs(Depots) do
