@@ -12,6 +12,62 @@ end)
 
 RegisterKeyMapping('radialmenu', 'Open Radial Menu', 'keyboard', 'F1')
 
+--Qb-garages
+CreateThread(function()
+    for k, v in pairs(Garages) do
+        exports['polyzonehelper']:AddBoxZone("InGarage", Garages[k].pz, Garages[k].length, Garages[k].width, {
+            name="InGarage",
+            heading=Garages[k].heading,
+            minZ=Garages[k].minZ,
+            maxZ=Garages[k].maxZ,
+            debugPoly=Garages[k].debugPz
+        })
+    end
+    for k, v in pairs(Depots) do
+        exports['polyzonehelper']:AddBoxZone("InDepots", Depots[k].pz, Depots[k].length, Depots[k].width, {
+            name="InDepots",
+            heading = Depots[k].heading,
+            debugPoly= Depots[k].debugPz
+        })
+    end
+end)
+
+local inGarage = false
+local inDepots = false
+
+AddEventHandler('polyzonehelper:enter', function(name)
+    if LocalPlayer.state["isLoggedIn"] then
+        if name == "InGarage" then
+            inGarage = true
+            print('Garage: enter')
+        elseif name == "InDepots" then
+            inDepots = true
+            print('Depot: enter')
+        end
+    end
+end)
+
+AddEventHandler('polyzonehelper:exit', function(name)
+    if LocalPlayer.state["isLoggedIn"] then
+        if name == "InGarage" then
+            inGarage = false
+            print('Garage: exit')
+        elseif name == "InDepots" then
+            inDepots = false
+            print('Depot: exit')
+        end
+    end
+end)
+
+exports("ZoneType", function(Zone)
+    if Zone == "GarageZone" then
+        return inGarage
+    elseif Zone == "DepotZone" then
+        return inDepots
+    end
+end)
+--
+
 function setupSubItems()
     QBCore.Functions.GetPlayerData(function(PlayerData)
         if PlayerData.metadata["isdead"] then
@@ -124,7 +180,7 @@ function setupSubItems()
             }
         end
     end
-    -- Qb-Radialmenu
+    -- qb-garages
     if inGarage then
         Config.MenuItems[5] = {
         id = 'garage',
@@ -349,62 +405,6 @@ function DrawText3Ds(x, y, z, text)
     DrawRect(0.0, 0.0+0.0125, 0.017+ factor, 0.03, 0, 0, 0, 75)
     ClearDrawOrigin()
 end
-
---Qb-radialmenu
-CreateThread(function()
-    for k, v in pairs(Garages) do
-        exports['polyzonehelper']:AddBoxZone("InGarage", Garages[k].pz, Garages[k].length, Garages[k].width, {
-            name="InGarage",
-            heading=Garages[k].heading,
-            minZ=Garages[k].minZ,
-            maxZ=Garages[k].maxZ,
-            debugPoly=Garages[k].debugPz
-        })
-    end
-    for k, v in pairs(Depots) do
-        exports['polyzonehelper']:AddBoxZone("InDepots", Depots[k].pz, Depots[k].length, Depots[k].width, {
-            name="InDepots",
-            heading = Depots[k].heading,
-            debugPoly= Depots[k].debugPz
-        })
-    end
-end)
-
-local inGarage = false
-local inDepots = false
-
-AddEventHandler('polyzonehelper:enter', function(name)
-    if LocalPlayer.state["isLoggedIn"] then
-        if name == "InGarage" then
-            inGarage = true
-            print('Garage: enter')
-        elseif name == "InDepots" then
-            inDepots = true
-            print('Depot: enter')
-        end
-    end
-end)
-
-AddEventHandler('polyzonehelper:exit', function(name)
-    if LocalPlayer.state["isLoggedIn"] then
-        if name == "InGarage" then
-            inGarage = false
-            print('Garage: exit')
-        elseif name == "InDepots" then
-            inDepots = false
-            print('Depot: exit')
-        end
-    end
-end)
-
-exports("ZoneType", function(Zone)
-    if Zone == "GarageZone" then
-        return inGarage
-    elseif Zone == "DepotZone" then
-        return inDepots
-    end
-end)
---
 
 exports('radialmenu', function(id, data)
     Config.MenuItems[id] = data
