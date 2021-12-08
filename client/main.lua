@@ -1,5 +1,4 @@
 QBCore = exports['qb-core']:GetCoreObject()
-
 local inRadialMenu = false
 
 RegisterCommand('radialmenu', function()
@@ -13,112 +12,7 @@ end)
 
 RegisterKeyMapping('radialmenu', 'Open Radial Menu', 'keyboard', 'F1')
 
-CreateThread(function()
-    for k, v in pairs(Garages) do
-        exports['polyzonehelper']:AddBoxZone("InGarage", Garages[k].pz, Garages[k].length, Garages[k].width, {
-            name="InGarage",
-            heading=Garages[k].heading,
-            minZ=Garages[k].minZ,
-            maxZ=Garages[k].maxZ,
-            debugPoly=Garages[k].debugPz
-        })
-    end
-    for k, v in pairs(Depots) do
-        exports['polyzonehelper']:AddBoxZone("InDepots", Depots[k].pz, Depots[k].length, Depots[k].width, {
-            name="InDepots",
-            heading = Depots[k].heading,
-            debugPoly= Depots[k].debugPz
-        })
-    end
-end)
-
-local inGarage = false
-local inDepots = false
-
-AddEventHandler('polyzonehelper:enter', function(name)
-    if LocalPlayer.state["isLoggedIn"] then
-        if name == "InGarage" then
-            inGarage = true
-            print('Garage: enter')
-        elseif name == "InDepots" then
-            inDepots = true
-            print('Depot: enter')
-        end
-    end
-end)
-
-AddEventHandler('polyzonehelper:exit', function(name)
-    if LocalPlayer.state["isLoggedIn"] then
-        if name == "InGarage" then
-            inGarage = false
-            print('Garage: exit')
-        elseif name == "InDepots" then
-            inDepots = false
-            print('Depot: exit')
-        end
-    end
-end)
-
-exports("ZoneType", function(Zone)
-    if Zone == "GarageZone" then
-        return inGarage
-    elseif Zone == "DepotZone" then
-        return inDepots
-    end
-end)
-
 function setupSubItems()
-    if inGarage then
-        Config.MenuItems[5] = {
-        id = 'garage',
-        title = 'Parking Garage',
-        icon = 'parking',
-        items = {
-            {
-                id = 'garagetake',
-                title = 'Take Out Vehicle',
-                icon = 'warehouse',
-                type = 'client',
-                event = 'Garages:PutOutGarage',
-                shouldClose = true
-            },
-            {
-                id = 'garagesave',
-                title = 'Park Vehicle',
-                icon = 'car',
-                type = 'client',
-                event = 'Garages:PutInGarage',
-                shouldClose = true
-            },
-        },
-    }
-    elseif inDepots then
-        Config.MenuItems[5] = {
-            id = 'depots',
-            title = 'Hayes Depots',
-            icon = 'question',
-            items = {
-                {
-                    id = 'depotstake',
-                    title = 'Take Vehicle',
-                    icon = 'car',
-                    type = 'client',
-                    event = 'Garages:TakeOutDepots',
-                    shouldClose = true
-                },
-                --{
-
-                --},
-            },
-        }
-    elseif not inGarage and not inDepots then
-        Config.MenuItems[5] = {
-            id = 'noaccess',
-            title = 'No Access!',
-            icon = 'exclamation',
-        }
-    end
-
     QBCore.Functions.GetPlayerData(function(PlayerData)
         if PlayerData.metadata["isdead"] then
             if PlayerData.job.name == "police" or PlayerData.job.name == "ambulance" then
@@ -229,6 +123,53 @@ function setupSubItems()
                 },
             }
         end
+    end
+    -- Qb-Radialmenu
+    if inGarage then
+        Config.MenuItems[5] = {
+        id = 'garage',
+        title = 'Parking Garage',
+        icon = 'parking',
+        items = {
+            {
+                id = 'garagetake',
+                title = 'Take Out Vehicle',
+                icon = 'warehouse',
+                type = 'client',
+                event = 'Garages:PutOutGarage',
+                shouldClose = true
+            },
+            {
+                id = 'garagesave',
+                title = 'Park Vehicle',
+                icon = 'car',
+                type = 'client',
+                event = 'Garages:PutInGarage',
+                shouldClose = true
+            },
+        },
+    }
+    elseif inDepots then
+        Config.MenuItems[5] = {
+            id = 'depots',
+            title = 'Hayes Depots',
+            icon = 'question',
+            items = {
+                {
+                    id = 'depotstake',
+                    title = 'Take Vehicle',
+                    icon = 'car',
+                    type = 'client',
+                    event = 'Garages:TakeOutDepots',
+                    shouldClose = true
+                },
+                --{
+
+                --},
+            },
+        }
+    elseif not inGarage and not inDepots then
+        Config.MenuItems[5] = nil
     end
 end
 
@@ -408,3 +349,63 @@ function DrawText3Ds(x, y, z, text)
     DrawRect(0.0, 0.0+0.0125, 0.017+ factor, 0.03, 0, 0, 0, 75)
     ClearDrawOrigin()
 end
+
+--Qb-radialmenu
+CreateThread(function()
+    for k, v in pairs(Garages) do
+        exports['polyzonehelper']:AddBoxZone("InGarage", Garages[k].pz, Garages[k].length, Garages[k].width, {
+            name="InGarage",
+            heading=Garages[k].heading,
+            minZ=Garages[k].minZ,
+            maxZ=Garages[k].maxZ,
+            debugPoly=Garages[k].debugPz
+        })
+    end
+    for k, v in pairs(Depots) do
+        exports['polyzonehelper']:AddBoxZone("InDepots", Depots[k].pz, Depots[k].length, Depots[k].width, {
+            name="InDepots",
+            heading = Depots[k].heading,
+            debugPoly= Depots[k].debugPz
+        })
+    end
+end)
+
+local inGarage = false
+local inDepots = false
+
+AddEventHandler('polyzonehelper:enter', function(name)
+    if LocalPlayer.state["isLoggedIn"] then
+        if name == "InGarage" then
+            inGarage = true
+            print('Garage: enter')
+        elseif name == "InDepots" then
+            inDepots = true
+            print('Depot: enter')
+        end
+    end
+end)
+
+AddEventHandler('polyzonehelper:exit', function(name)
+    if LocalPlayer.state["isLoggedIn"] then
+        if name == "InGarage" then
+            inGarage = false
+            print('Garage: exit')
+        elseif name == "InDepots" then
+            inDepots = false
+            print('Depot: exit')
+        end
+    end
+end)
+
+exports("ZoneType", function(Zone)
+    if Zone == "GarageZone" then
+        return inGarage
+    elseif Zone == "DepotZone" then
+        return inDepots
+    end
+end)
+--
+
+exports('radialmenu', function(id, data)
+    Config.MenuItems[id] = data
+end)
