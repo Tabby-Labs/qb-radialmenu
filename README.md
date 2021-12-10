@@ -12,13 +12,12 @@ Original Script - [qb-radialmeu](https://github.com/qbcore-framework/qb-radialme
 * [polyzonehelper](https://github.com/bashenga/polyzonehelper) --*/ To trigger the radialmenu when inside the zone
 * [qb-garages](https://github.com/MahmoodHensem/qb-garages) --*/ qb-garages Edited version by me
 
-# features
-add an exports 
-```lua -/* How to use the exports
-```
+# To Do
+Make it works with qb-customs
 
-# TO DO
-Make it work with qb-customs
+# Features
+Add an exports
+Now Work with Shared Garaes(Jobs & Gangs)
 
 # License
 
