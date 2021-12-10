@@ -14,7 +14,7 @@ RegisterKeyMapping('radialmenu', 'Open Radial Menu', 'keyboard', 'F1')
 
 --Qb-garages
 CreateThread(function()
-    for k, v in pairs(Garages) do
+    for k, v in pairs(Garages) do --Public Garage
         exports['polyzonehelper']:AddBoxZone("InGarage", Garages[k].pz, Garages[k].length, Garages[k].width, {
             name="InGarage",
             heading=Garages[k].heading,
@@ -23,7 +23,25 @@ CreateThread(function()
             debugPoly=Garages[k].debugPz
         })
     end
-    for k, v in pairs(Depots) do
+    for k, v in pairs(JobGarages) do --Job Garage
+        exports['polyzonehelper']:AddBoxZone("InJobGarage", JobGarages[k].pz, JobGarages[k].length, JobGarages[k].width, {
+            name="InJobGarage",
+            heading=JobGarages[k].heading,
+            minZ=JobGarages[k].minZ,
+            maxZ=JobGarages[k].maxZ,
+            debugPoly=JobGarages[k].debugPz
+        })
+    end
+    for k, v in pairs(GangGarages) do --Gang Garage
+        exports['polyzonehelper']:AddBoxZone("InGangGarage", GangGarages[k].pz, GangGarages[k].length, GangGarages[k].width, {
+            name="InGangGarage",
+            heading=GangGarages[k].heading,
+            minZ=GangGarages[k].minZ,
+            maxZ=GangGarages[k].maxZ,
+            debugPoly=GangGarages[k].debugPz
+        })
+    end
+    for k, v in pairs(Depots) do --Depot Garage
         exports['polyzonehelper']:AddBoxZone("InDepots", Depots[k].pz, Depots[k].length, Depots[k].width, {
             name="InDepots",
             heading = Depots[k].heading,
@@ -34,6 +52,8 @@ end)
 
 local inGarage = false
 local inDepots = false
+local inJobGarage = false
+local inGangGarage = false
 
 AddEventHandler('polyzonehelper:enter', function(name)
     if LocalPlayer.state["isLoggedIn"] then
@@ -43,7 +63,13 @@ AddEventHandler('polyzonehelper:enter', function(name)
         elseif name == "InDepots" then
             inDepots = true
             print('Depot: enter')
-        end
+        elseif name == "InJobGarage" then
+            inJobGarage = true
+            print('JobGarage: Enter')
+        elseif name == "InGangGarage" then
+            inGangGarage = true
+            print('GangGarage: Enter')
+        end  
     end
 end)
 
@@ -55,6 +81,12 @@ AddEventHandler('polyzonehelper:exit', function(name)
         elseif name == "InDepots" then
             inDepots = false
             print('Depot: exit')
+        elseif name == "InJobGarage" then
+            inJobGarage = false
+            print('JobGarage: Exit')
+        elseif name == "InGangGarage" then
+            inGangGarage = false
+            print('GangGarage: Exit')
         end
     end
 end)
@@ -64,6 +96,10 @@ exports("ZoneType", function(Zone)
         return inGarage
     elseif Zone == "DepotZone" then
         return inDepots
+    elseif Zone == "JobGarageZone" then
+        return inJobGarage
+    elseif Zone == "GangGarageZone" then
+        return inGangGarage
     end
 end)
 --
@@ -183,28 +219,28 @@ function setupSubItems()
     -- qb-garages
     if inGarage then
         Config.MenuItems[5] = {
-        id = 'garage',
-        title = 'Parking Garage',
-        icon = 'parking',
-        items = {
-            {
-                id = 'garagetake',
-                title = 'Take Out Vehicle',
-                icon = 'warehouse',
-                type = 'client',
-                event = 'Garages:PutOutGarage',
-                shouldClose = true
+            id = 'garage',
+            title = 'Parking Garage',
+            icon = 'parking',
+            items = {
+                {
+                    id = 'garagetake',
+                    title = 'Take Out Vehicle',
+                    icon = 'warehouse',
+                    type = 'client',
+                    event = 'Garages:PutOutGarage',
+                    shouldClose = true
+                },
+                {
+                    id = 'garagesave',
+                    title = 'Park Vehicle',
+                    icon = 'car',
+                    type = 'client',
+                    event = 'Garages:PutInGarage',
+                    shouldClose = true
+                },
             },
-            {
-                id = 'garagesave',
-                title = 'Park Vehicle',
-                icon = 'car',
-                type = 'client',
-                event = 'Garages:PutInGarage',
-                shouldClose = true
-            },
-        },
-    }
+        }
     elseif inDepots then
         Config.MenuItems[5] = {
             id = 'depots',
@@ -219,12 +255,57 @@ function setupSubItems()
                     event = 'Garages:TakeOutDepots',
                     shouldClose = true
                 },
-                --{
-
-                --},
             },
         }
-    elseif not inGarage and not inDepots then
+    elseif inJobGarage then
+        Config.MenuItems[5] = {
+            id = 'jobgarage',
+            title = 'Parking',
+            icon = 'parking',
+            items = {
+                {
+                    id = 'jobgaragetake',
+                    title = 'Take Out Vehicle',
+                    icon = 'warehouse',
+                    type = 'client',
+                    event = 'Garage:PutOutJob',
+                    shouldClose = true
+                },
+                {
+                    id = 'jobgaragesave',
+                    title = 'Park Vehicle',
+                    icon = 'car',
+                    type = 'client',
+                    event = 'Garage:PutInJob',
+                    shouldClose = true
+                },
+            },
+        }
+    elseif inGangGarage then
+        Config.MenuItems[5] = {
+            id = 'ganggarage',
+            title = 'Parking',
+            icon = 'parking',
+            items = {
+                {
+                    id = 'ganggaragetake',
+                    title = 'Take Out Vehicle',
+                    icon = 'warehouse',
+                    type = 'client',
+                    event = 'Garage:PutOutGang',
+                    shouldClose = true
+                },
+                {
+                    id = 'ganggaragesave',
+                    title = 'Park Vehicle',
+                    icon = 'car',
+                    type = 'client',
+                    event = 'Garage:PutInGang',
+                    shouldClose = true
+                },
+            },
+        }
+    elseif not inGarage and not inDepots and not inGangGarage and not inJobGarage then
         Config.MenuItems[5] = nil
     end
 end
